@@ -17,8 +17,13 @@ def fork_recipe(user_id, recipe_id):
     db.session.flush()
     return fork
 
-def get_versions(recipe_id):
-    pass
-
 def update_recipe(recipe_id, ingredients=None, steps=None):
+    recipe = db.session.query(db.Recipie).get(recipe_id)
+    data = db.RecipieData(ingredients=ingredients, steps=steps, parent_id=recipe.data.id)
+    db.session.add(data)
+    db.session.flush()
+    db.session.query(db.Recipie).filter_by(id=recipe_id).update({"data_id": data.id})
+    db.session.flush()
+
+def get_versions(recipe_id):
     pass

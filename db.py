@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Integer, Column, String, ForeignKey
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship, backref
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.dialects.postgresql import JSON
 
 import os
@@ -8,8 +8,8 @@ import os
 Base = declarative_base()
 engine = create_engine(os.environ.get('DATABASE_URL', 'postgres://localhost/recipehub_service'),
                        convert_unicode=True)
-session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
+session = scoped_session(sessionmaker(autocommit=True,
+                                         autoflush=True,
                                          bind=engine))
 
 class Recipie(Base):
@@ -28,4 +28,5 @@ class RecipieData(Base):
     ingredients = Column(JSON())
     steps = Column(JSON())
     parent_id = Column(Integer(), ForeignKey('recipie_data.id'))
-    parent = relationship('RecipieData')
+    children = relationship('RecipieData', backref=
+        backref('parent', lazy='joined', remote_side=[id]))

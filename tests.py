@@ -1,6 +1,6 @@
 import unittest
 import db
-from data import new_recipe, fork_recipe
+from data import new_recipe, fork_recipe, update_recipe
 
 def clean():
     db.session.close()
@@ -26,6 +26,24 @@ class ForkRecipe(unittest.TestCase):
         self.assertEqual(db.session.query(db.Recipie).count(), 2)
         self.assertEqual(db.session.query(db.RecipieData).count(), 1)
 
+class UpdateRecipe(unittest.TestCase):
+    def setUp(self):
+        clean()
+
+    def test_update_recipe(self):
+        recipie = new_recipe(**sunny_side_up)
+        update_recipe(recipie.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
+        self.assertEqual(db.session.query(db.Recipie).count(), 1)
+        self.assertEqual(db.session.query(db.RecipieData).count(), 2)
+        recipe = db.session.query(db.Recipie).first()
+        self.assertIn("cheese", recipie.data.ingredients)
+
+    def test_parent_data(self):
+        recipie = new_recipe(**sunny_side_up)
+        old_data_id = recipie.data.id
+        update_recipe(recipie.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
+        self.assertEquals(recipie.data.parent.id, old_data_id)
+
 
 
 sunny_side_up = {
@@ -44,6 +62,26 @@ sunny_side_up = {
         "Break eggs and put them",
         "Add salt and close the lid",
         "Once done serve in plate and put hot sauce"
+    ]
+}
+
+sunny_side_up_v2 = {
+    # "id": 1,
+    "title": "Sunny side up",
+    "user_id": 1,
+    "fork_of": None,
+    "ingredients": {
+        "canola_oil": 1,  # one tbsp oil
+        "salt": None,     # to taste
+        "eggs": 2,        # two eggs
+        "cheese": 2 # to taste
+    },
+    "steps": [
+        "Heat oil in a pan",
+        "Break eggs and put them in the pan",
+        "sprinkle cheese on the eggs",
+        "Add salt and close the lid",
+        "Once done serve in plate"
     ]
 }
 
