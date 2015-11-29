@@ -12,21 +12,21 @@ session = scoped_session(sessionmaker(autocommit=True,
                                          autoflush=True,
                                          bind=engine))
 
-class Recipie(Base):
-    __tablename__ = 'recipie'
+class Recipe(Base):
+    __tablename__ = 'recipe'
     id = Column(Integer(), primary_key=True)
     title = Column(String(140))
     user_id = Column(Integer())
-    fork_of_id = Column(Integer(), ForeignKey('recipie.id'), nullable=True)
-    data_id = Column(Integer(), ForeignKey('recipie_data.id'), nullable=False)
-    data = relationship('RecipieData', backref=
-        backref('recipies', lazy='joined'))
+    fork_of_id = Column(Integer(), ForeignKey('recipe.id'), nullable=True)
+    data_id = Column(Integer(), ForeignKey('recipe_data.id'), nullable=False)
+    data = relationship('RecipeData', backref=
+        backref('recipes', lazy='joined'))
 
-class RecipieData(Base):
-    __tablename__ = 'recipie_data'
+class RecipeData(Base):
+    __tablename__ = 'recipe_data'
     id = Column(Integer(), primary_key=True)
     ingredients = Column(JSON())
     steps = Column(JSON())
-    parent_id = Column(Integer(), ForeignKey('recipie_data.id'))
-    children = relationship('RecipieData', backref=
+    parent_id = Column(Integer(), ForeignKey('recipe_data.id'))
+    children = relationship('RecipeData', backref=
         backref('parent', lazy='joined', remote_side=[id]))

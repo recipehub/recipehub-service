@@ -12,37 +12,37 @@ class NewRecipe(unittest.TestCase):
         clean()
 
     def test_new_recipe(self):
-        recipie = new_recipe(**sunny_side_up)
-        self.assertEqual(db.session.query(db.Recipie).count(), 1)
-        self.assertEqual(db.session.query(db.RecipieData).count(), 1)
+        recipe = new_recipe(**sunny_side_up)
+        self.assertEqual(db.session.query(db.Recipe).count(), 1)
+        self.assertEqual(db.session.query(db.RecipeData).count(), 1)
 
 class ForkRecipe(unittest.TestCase):
     def setUp(self):
         clean()
 
     def test_recipe_fork(self):
-        recipie = new_recipe(**sunny_side_up)
-        fork = fork_recipe(2, recipie.id)
-        self.assertEqual(db.session.query(db.Recipie).count(), 2)
-        self.assertEqual(db.session.query(db.RecipieData).count(), 1)
+        recipe = new_recipe(**sunny_side_up)
+        fork = fork_recipe(2, recipe.id)
+        self.assertEqual(db.session.query(db.Recipe).count(), 2)
+        self.assertEqual(db.session.query(db.RecipeData).count(), 1)
 
 class UpdateRecipe(unittest.TestCase):
     def setUp(self):
         clean()
 
     def test_update_recipe(self):
-        recipie = new_recipe(**sunny_side_up)
-        update_recipe(recipie.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
-        self.assertEqual(db.session.query(db.Recipie).count(), 1)
-        self.assertEqual(db.session.query(db.RecipieData).count(), 2)
-        recipe = db.session.query(db.Recipie).first()
-        self.assertIn("cheese", recipie.data.ingredients)
+        recipe = new_recipe(**sunny_side_up)
+        update_recipe(recipe.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
+        self.assertEqual(db.session.query(db.Recipe).count(), 1)
+        self.assertEqual(db.session.query(db.RecipeData).count(), 2)
+        recipe = db.session.query(db.Recipe).first()
+        self.assertIn("cheese", recipe.data.ingredients)
 
     def test_parent_data(self):
-        recipie = new_recipe(**sunny_side_up)
-        old_data_id = recipie.data.id
-        update_recipe(recipie.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
-        self.assertEquals(recipie.data.parent.id, old_data_id)
+        recipe = new_recipe(**sunny_side_up)
+        old_data_id = recipe.data.id
+        update_recipe(recipe.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
+        self.assertEquals(recipe.data.parent.id, old_data_id)
 
 
 
