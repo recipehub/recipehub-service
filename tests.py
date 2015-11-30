@@ -1,6 +1,6 @@
 import unittest
 import db
-from data import new_recipe, fork_recipe, update_recipe
+from data import new_recipe, fork_recipe, update_recipe, get_versions
 
 def clean():
     db.session.close()
@@ -45,6 +45,19 @@ class UpdateRecipe(unittest.TestCase):
         self.assertEquals(recipe.data.parent.id, old_data_id)
 
 
+class GetVersions(unittest.TestCase):
+    def setUp(self):
+        clean()
+        insert_all()
+
+    def test_versions(self):
+        recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
+        self.assertEqual(len(get_versions(recipe.id)), 2)
+
+def insert_all():
+        recipe = new_recipe(**sunny_side_up)
+        update_recipe(recipe.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
+        new_recipe(**begun_bhaja)
 
 sunny_side_up = {
     # "id": 1,
@@ -82,6 +95,26 @@ sunny_side_up_v2 = {
         "sprinkle cheese on the eggs",
         "Add salt and close the lid",
         "Once done serve in plate"
+    ]
+}
+
+begun_bhaja = {
+    "title": "Begun Bhaja",
+    "user_id": 1,
+    "fork_of": None,
+    "ingredients": {
+        "egg_plant": 1,  # one tbsp oil
+        "canola_oil": 2,        # two eggs
+        "salt": None,     # to taste
+        "chilli_powder": 2 # to taste
+    },
+    "steps": [
+        "Slice egg plants",
+        "Heat oil in a pan",
+        "Place slices in the oil",
+        "sprinkle salt and chilli powder",
+        "Flip the slices and fry the other side",
+        "Serve on a plate with paper towel"
     ]
 }
 

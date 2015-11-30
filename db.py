@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Integer, Column, String, ForeignKey
-from sqlalchemy.orm import scoped_session, sessionmaker, relationship, backref
+from sqlalchemy.orm import scoped_session, sessionmaker, relationship, backref, aliased
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.dialects.postgresql import JSON
 

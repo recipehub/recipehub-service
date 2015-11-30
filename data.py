@@ -26,4 +26,15 @@ def update_recipe(recipe_id, ingredients=None, steps=None):
     db.session.flush()
 
 def get_versions(recipe_id):
-    pass
+    data_tip_id = db.session.query(db.Recipe).get(recipe_id).data_id
+    included_parts = db.session.query(db.RecipeData).\
+                     filter(db.RecipeData.id==data_tip_id).\
+                     cte(name='included_parts', recursive=True)
+
+    incl_alias = db.aliased(included_parts, name="pr")
+    parts_alias = db.aliased(db.RecipeData, name='p')
+    included_parts = included_parts.union_all(
+        db.session.query(parts_alias).filter(parts_alias.id==incl_alias.c.parent_id)
+    )
+
+    return db.session.query(included_parts).filter(db.RecipeData.id==data_tip_id).all()
