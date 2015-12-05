@@ -33,6 +33,7 @@ def update_recipe(recipe_id, ingredients=None, steps=None):
     db.session.flush()
     db.session.query(db.Recipe).filter_by(id=recipe_id).update({"data_id": data.id})
     db.session.flush()
+    return get_recipe(recipe.id)
 
 def get_versions(recipe_id):
     data_tip_id = db.session.query(db.Recipe).get(recipe_id).data_id
