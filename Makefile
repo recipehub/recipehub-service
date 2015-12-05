@@ -1,5 +1,5 @@
 test:
-	/Users/pdvyas/.virtualenvs/recipehub-service-dev/bin/python tests.py
+	python tests.py --verbose
 
 test_sql:
 	cat test.sql | psql testrecur
