@@ -104,13 +104,13 @@ class TestForkRecipe(Test):
     def test_recipe_fork(self):
         recipe = new_recipe(**sunny_side_up)
         resp = test_client.post('/fork/1/', data={'user_id': 2})
-        print resp.data
         self.assertEqual(db.session.query(db.Recipe).count(), 2)
         self.assertEqual(db.session.query(db.RecipeData).count(), 1)
 
 class TestGetRecipeForUsers(TestWithData):
     def test_get_recipe(self):
         resp = json.loads(test_client.get('/recipe/?user_id=1&user_id=2').data)
+        self.assertEqual(db.session.query(db.Recipe).count(), 2)
 
 # Test Data
 

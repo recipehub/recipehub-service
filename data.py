@@ -5,7 +5,10 @@ def get_recipe(recipe_id):
     return db.session.query(db.Recipe).get(recipe_id)
 
 def get_recipes_for_user(user_id):
-    return db.session.query(db.Recipe).filter_by(user_id=user_id).all()
+    return db.session.query(db.Recipe).filter(db.Recipe.user_id==user_id).order_by(db.Recipe.created_at.desc()).all()
+
+def get_recipes_for_users(user_ids):
+    return db.session.query(db.Recipe).filter(db.Recipe.user_id.in_(user_ids)).order_by(db.Recipe.created_at.desc()).all()
 
 def new_recipe(title, user_id, ingredients, steps, id=None, fork_of=None):
     data = db.RecipeData(ingredients=ingredients, steps=steps)
