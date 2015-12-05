@@ -1,6 +1,12 @@
 import db
 import json
 
+def get_recipe(recipe_id):
+    return db.session.query(db.Recipe).get(recipe_id)
+
+def get_recipes_for_user(user_id):
+    return db.session.query(db.Recipe).filter_by(user_id=user_id).all()
+
 def new_recipe(title, user_id, ingredients, steps, id=None, fork_of=None):
     data = db.RecipeData(ingredients=ingredients, steps=steps)
     db.session.add(data)

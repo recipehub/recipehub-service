@@ -2,7 +2,7 @@ import unittest
 import db
 import json
 from datetime import datetime
-from data import new_recipe, fork_recipe, update_recipe, get_versions
+from data import new_recipe, fork_recipe, update_recipe, get_versions, get_recipes_for_user
 from api import app
 
 test_client = app.test_client()
@@ -67,15 +67,20 @@ class GetVersions(TestWithData):
         recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
         self.assertEqual(len(get_versions(recipe.id)), 2)
 
-class CheckTimestamp(TestWithData):
+class Timestamp(TestWithData):
 
     def test_recipe_timestamp(self):
         recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
-        self.assertEqual(recipe.created_at.date(), datetime.today().date())
+        self.assertEqual(recipe.created_at.date(), datetime.utcnow().date())
 
     def test_recipe_data_timestamp(self):
         recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
-        self.assertEqual(recipe.data.created_at.date(), datetime.today().date())
+        self.assertEqual(recipe.data.created_at.date(), datetime.utcnow().date())
+
+class GetUserRecipes(TestWithData):
+
+    def test_user_recipes(self):
+        self.assertEqual(len(get_recipes_for_user(1)), 1)
 
 # API!
 
@@ -85,7 +90,10 @@ class Ping(unittest.TestCase):
         self.assertIn("pong", resp)
 
 class TestGetRecipe(TestWithData):
-    pass
+    def test_get_recipe(self):
+        resp = json.loads(test_client.get('/recipe/1').data)
+        self.assertIn("title", resp)
+        self.assertIn("data", resp)
 
 
 # Test Data
@@ -131,7 +139,7 @@ sunny_side_up_v2 = {
 
 begun_bhaja = {
     "title": "Begun Bhaja",
-    "user_id": 1,
+    "user_id": 2,
     "fork_of": None,
     "ingredients": {
         "egg_plant": 1,  # one tbsp oil
