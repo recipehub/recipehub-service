@@ -41,7 +41,7 @@ class RecipeList(Resource):
         else:
             return get_recipes_for_users(args['user_id'])
 
-    @marshal_with(RecipeSchema, many=True)
+    @marshal_with(RecipeSchema)
     def post(self):
         recipe = json.loads(request.data)
         return new_recipe(**recipe)
