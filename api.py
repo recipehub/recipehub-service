@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_restful import Resource, fields, Api, reqparse
-from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe)
+from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe, update_recipe)
 from utils import marshal_with
 from schema import RecipeSchema, RecipeDataSchema
 from werkzeug.exceptions import BadRequest
@@ -23,8 +23,10 @@ class Recipe(Resource):
 
     @marshal_with(RecipeSchema)
     def put(self, recipe_id):
-        args = parser.parse_args()
-        return get_recipe(recipe_id)
+        recipe_data = json.loads(request.data)
+        if not recipe_data.get('ingredients') or not recipe_data.get('steps'):
+            raise BadRequest
+        return update_recipe(recipe_id, ingredients=recipe_data['ingredients'], steps=recipe_data['steps'])
 
 
 class RecipeList(Resource):

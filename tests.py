@@ -119,6 +119,16 @@ class TestNewRecipe(Test):
         self.assertEqual(db.session.query(db.Recipe).count(), 1)
         self.assertEqual(db.session.query(db.RecipeData).count(), 1)
 
+
+class TestUpdateRecipe(Test):
+
+    def test_update_recipe(self):
+        recipe = new_recipe(**sunny_side_up)
+        test_client.put('/recipe/{}/'.format(recipe.id), data=json.dumps(sunny_side_up_v2))
+        self.assertEqual(db.session.query(db.Recipe).count(), 1)
+        self.assertEqual(db.session.query(db.RecipeData).count(), 2)
+        recipe = db.session.query(db.Recipe).first()
+        self.assertIn("cheese", recipe.data.ingredients)
 # Test Data
 
 sunny_side_up = {
