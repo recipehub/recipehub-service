@@ -1,8 +1,8 @@
 from flask import Flask
-from functools import wraps
-from flask_restful import Resource, fields, Api
+from flask_restful import Resource, fields, Api, reqparse
 from data import (get_recipe, )
-
+from utils import marshal_with
+from schema import RecipeSchema, RecipeDataSchema
 
 import db
 import json
@@ -10,35 +10,21 @@ import json
 app = Flask(__name__)
 api = Api(app)
 
-from marshmallow import Schema, fields
 
-class RecipeDataSchema(Schema):
-    id = fields.Int()
-    created_at = fields.DateTime()
-    ingredients = fields.Dict()
-    steps = fields.List(fields.Str())
-    parent_id = fields.Int()
-
-class RecipeSchema(Schema):
-    id = fields.Int()
-    created_at = fields.DateTime()
-    title = fields.Str()
-    fork_of = fields.Int()
-    user_id = fields.Int()
-    data = fields.Nested(RecipeDataSchema)
-
-def marshal_with(schema_class):
-    def wrapper(f):
-        @wraps(f)
-        def _f(*args, **kwargs):
-            schema = schema_class()
-            return  schema.dumps(f(*args, **kwargs)).data
-        return _f
-    return wrapper
+parser = reqparse.RequestParser()
+parser.add_argument('user_id', type=int, help='User ID')
 
 class Recipe(Resource):
     @marshal_with(RecipeSchema)
     def get(self, recipe_id):
+        args = parser.parse_args()
+        return get_recipe(recipe_id)
+
+class RecipeList(Resource):
+
+    @marshal_with(RecipeSchema)
+    def get(self, recipe_id):
+        args = parser.parse_args()
         return get_recipe(recipe_id)
 
 class Ping(Resource):
