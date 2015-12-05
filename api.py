@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Resource, fields, Api, reqparse
-from data import (get_recipe, )
+from data import (get_recipe, get_recipes_for_user)
 from utils import marshal_with
 from schema import RecipeSchema, RecipeDataSchema
 
@@ -22,10 +22,11 @@ class Recipe(Resource):
 
 class RecipeList(Resource):
 
-    @marshal_with(RecipeSchema)
-    def get(self, recipe_id):
+    @marshal_with(RecipeSchema, many=True)
+    def get(self):
         args = parser.parse_args()
-        return get_recipe(recipe_id)
+        if args.get('user_id'):
+            return get_recipes_for_user(args['user_id'])
 
 class Ping(Resource):
     def get(self):
@@ -33,6 +34,7 @@ class Ping(Resource):
 
 api.add_resource(Ping, '/ping')
 api.add_resource(Recipe, '/recipe/<int:recipe_id>')
+api.add_resource(RecipeList, '/recipe/')
 
 if __name__ == '__main__':
     app.run(debug=True)

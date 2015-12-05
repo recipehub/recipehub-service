@@ -14,3 +14,6 @@ class RecipeSchema(Schema):
     fork_of = fields.Int()
     user_id = fields.Int()
     data = fields.Nested(RecipeDataSchema)
+
+    class Meta:
+        ordered = True

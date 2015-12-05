@@ -92,8 +92,13 @@ class Ping(unittest.TestCase):
 class TestGetRecipe(TestWithData):
     def test_get_recipe(self):
         resp = json.loads(test_client.get('/recipe/1').data)
-        self.assertIn("title", resp)
+        self.assertIn("id", resp)
         self.assertIn("data", resp)
+
+class TestUserRecipe(TestWithData):
+    def test_get_recipe(self):
+        resp = json.loads(test_client.get('/recipe/?user_id=1').data)
+        self.assertEqual(len(resp), 1)
 
 
 # Test Data
