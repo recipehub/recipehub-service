@@ -50,10 +50,9 @@ class RecipeList(Resource):
 class Fork(Resource):
     @marshal_with(RecipeSchema)
     def post(self, recipe_id):
-        args = parser.parse_args()
-        if not len(args.get('user_id')) == 1:
+        user_id = json.loads(request.data).get('user_id')
+        if not user_id:
             raise BadRequest
-        user_id = args['user_id'][0]
         fork_recipe(user_id, recipe_id)
 
 class Ping(Resource):
