@@ -4,4 +4,6 @@ addons:
 services:
   - postgresql
 install: "pip install -r requirements.txt"
+before_script:
+  - psql -c 'create database recipehub_service;' -U postgres
 script: make test
