@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, fields, Api, reqparse
-from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users)
+from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe)
 from utils import marshal_with
 from schema import RecipeSchema, RecipeDataSchema
 from werkzeug.exceptions import BadRequest
@@ -21,6 +21,11 @@ class Recipe(Resource):
         args = parser.parse_args()
         return get_recipe(recipe_id)
 
+    @marshal_with(RecipeSchema)
+    def put(self, recipe_id):
+        args = parser.parse_args()
+        return get_recipe(recipe_id)
+
 
 class RecipeList(Resource):
 
@@ -33,6 +38,11 @@ class RecipeList(Resource):
             return get_recipes_for_user(args['user_id'][0])
         else:
             return get_recipes_for_users(args['user_id'])
+
+    @marshal_with(RecipeSchema, many=True)
+    def post(self):
+        recipe = json.loads(request.data)
+        return new_recipe(**recipe)
 
 
 class Fork(Resource):

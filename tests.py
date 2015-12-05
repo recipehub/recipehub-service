@@ -112,6 +112,13 @@ class TestGetRecipeForUsers(TestWithData):
         resp = json.loads(test_client.get('/recipe/?user_id=1&user_id=2').data)
         self.assertEqual(db.session.query(db.Recipe).count(), 2)
 
+class TestNewRecipe(Test):
+
+    def test_new_recipe(self):
+        test_client.post('/recipe/', data=json.dumps(sunny_side_up))
+        self.assertEqual(db.session.query(db.Recipe).count(), 1)
+        self.assertEqual(db.session.query(db.RecipeData).count(), 1)
+
 # Test Data
 
 sunny_side_up = {
