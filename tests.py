@@ -114,6 +114,15 @@ class GetVersion(TestWithData):
             get_version(recipe2.id, old_version_id)
 
 
+class APIGetVersion(TestWithData):
+
+    def test_get_version(self):
+        recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
+        old_version_id = get_versions(recipe.id)[1]
+        data = test_client.get('/recipe/{}/?version_id={}'.format(recipe.id, old_version_id)).data
+        data = json.loads(data)
+        self.assertEqual(data['data']['id'], old_version_id)
+
 class Timestamp(TestWithData):
 
     def test_recipe_timestamp(self):

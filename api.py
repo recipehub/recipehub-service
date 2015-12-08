@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_restful import Resource, fields, Api, reqparse
-from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe, update_recipe, get_forks, get_versions)
+from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe, update_recipe, get_forks, get_versions, get_version)
 from utils import marshal_with
 from schema import RecipeSchema, RecipeDataSchema
 from werkzeug.exceptions import BadRequest
@@ -15,12 +15,16 @@ api = Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('user_id', type=int, help='User ID', action="append")
 parser.add_argument('recipe_id', type=int, help='Recipe ID')
+parser.add_argument('version_id', type=int, help='Version ID')
 
 class Recipe(Resource):
     @marshal_with(RecipeSchema)
     def get(self, recipe_id):
         args = parser.parse_args()
-        return get_recipe(recipe_id)
+        version_id = args.get('version_id')
+        if not version_id:
+            return get_recipe(recipe_id)
+        return get_version(recipe_id, version_id)
 
     @marshal_with(RecipeSchema)
     def put(self, recipe_id):
