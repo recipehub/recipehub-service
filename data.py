@@ -21,10 +21,13 @@ def new_recipe(title, user_id, ingredients, steps, id=None, fork_of=None):
 
 def fork_recipe(user_id, recipe_id):
     recipe = db.session.query(db.Recipe).get(recipe_id)
-    fork = db.Recipe(title=recipe.title, user_id=user_id, data=recipe.data)
+    fork = db.Recipe(title=recipe.title, user_id=user_id, data=recipe.data, fork_of_id=recipe.id)
     db.session.add(fork)
     db.session.flush()
     return fork
+
+def get_forks(recipe_id):
+    return db.session.query(db.Recipe).filter_by(fork_of_id=recipe_id).all()
 
 def update_recipe(recipe_id, ingredients=None, steps=None):
     recipe = db.session.query(db.Recipe).get(recipe_id)

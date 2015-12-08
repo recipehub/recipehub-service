@@ -53,7 +53,7 @@ class Fork(Resource):
         user_id = json.loads(request.data).get('user_id')
         if not user_id:
             raise BadRequest
-        fork_recipe(user_id, recipe_id)
+        return fork_recipe(user_id, recipe_id)
 
 class Ping(Resource):
     def get(self):
@@ -63,6 +63,13 @@ api.add_resource(Ping,       '/ping/')
 api.add_resource(Recipe,     '/recipe/<int:recipe_id>/')
 api.add_resource(Fork,       '/fork/<int:recipe_id>/')
 api.add_resource(RecipeList, '/recipe/')
+
+@app.route('/clean')
+def _clean():
+    from tests import clean
+    clean()
+    return 'done'
+
 
 if __name__ == '__main__':
     app.run(debug=True)

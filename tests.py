@@ -2,8 +2,9 @@ import unittest
 import db
 import json
 from datetime import datetime
-from data import new_recipe, fork_recipe, update_recipe, get_versions, get_recipes_for_user
+from data import new_recipe, fork_recipe, update_recipe, get_versions, get_recipes_for_user, get_forks
 from api import app
+app.config['DEBUG'] = True
 
 test_client = app.test_client()
 
@@ -39,6 +40,19 @@ class ForkRecipe(Test):
         fork = fork_recipe(2, recipe.id)
         self.assertEqual(db.session.query(db.Recipe).count(), 2)
         self.assertEqual(db.session.query(db.RecipeData).count(), 1)
+
+class ForkRecipeLink(Test):
+    def test_fork_link(self):
+        recipe = new_recipe(**sunny_side_up)
+        fork = fork_recipe(2, recipe.id)
+        self.assertEqual(fork.fork_of_id, recipe.id)
+
+class RecipeForkList(Test):
+    def test_fork_list(self):
+        recipe = new_recipe(**sunny_side_up)
+        recipe = new_recipe(**begun_bhaja)
+        fork = fork_recipe(2, recipe.id)
+        self.assertEqual(get_forks(recipe.id)[0].id, fork.id)
 
 
 class UpdateRecipe(Test):
@@ -103,7 +117,7 @@ class TestUserRecipe(TestWithData):
 class TestForkRecipe(Test):
     def test_recipe_fork(self):
         recipe = new_recipe(**sunny_side_up)
-        resp = test_client.post('/fork/1/', data={'user_id': 2})
+        resp = test_client.post('/fork/1/', data=json.dumps({'user_id': 2}))
         self.assertEqual(db.session.query(db.Recipe).count(), 2)
         self.assertEqual(db.session.query(db.RecipeData).count(), 1)
 

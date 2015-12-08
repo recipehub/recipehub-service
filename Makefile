@@ -1,5 +1,5 @@
 test:
-	python tests.py --verbose
+	python tests.py 
 
 test_sql:
 	cat test.sql | psql testrecur

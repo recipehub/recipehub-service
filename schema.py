@@ -11,7 +11,7 @@ class RecipeSchema(Schema):
     id = fields.Int()
     created_at = fields.DateTime()
     title = fields.Str()
-    fork_of = fields.Int()
+    fork_of_id = fields.Int()
     user_id = fields.Int()
     data = fields.Nested(RecipeDataSchema)
 
