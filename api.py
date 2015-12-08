@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_restful import Resource, fields, Api, reqparse
-from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe, update_recipe, get_forks)
+from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe, update_recipe, get_forks, get_versions)
 from utils import marshal_with
 from schema import RecipeSchema, RecipeDataSchema
 from werkzeug.exceptions import BadRequest
@@ -65,6 +65,13 @@ class Fork(Resource):
             raise BadRequest
         return fork_recipe(user_id, recipe_id)
 
+class Version(Resource):
+    @marshal_with(RecipeSchema, many=True)
+    def get(self, recipe_id):
+        return get_versions(recipe_id)
+
+
+
 class Ping(Resource):
     def get(self):
         return {'pong': True}
@@ -74,6 +81,7 @@ api.add_resource(Recipe,     '/recipe/<int:recipe_id>/')
 api.add_resource(Fork,       '/fork/<int:recipe_id>/')
 api.add_resource(RecipeList, '/recipe/')
 api.add_resource(ForkList,   '/fork/')
+api.add_resource(Version,     '/version/<int:recipe_id>/')
 
 @app.route('/clean')
 def _clean():
