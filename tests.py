@@ -47,6 +47,7 @@ class ForkRecipeLink(Test):
         fork = fork_recipe(2, recipe.id)
         self.assertEqual(fork.fork_of_id, recipe.id)
 
+
 class RecipeForkList(Test):
     def test_fork_list(self):
         recipe = new_recipe(**sunny_side_up)
@@ -54,6 +55,15 @@ class RecipeForkList(Test):
         fork = fork_recipe(2, recipe.id)
         self.assertEqual(get_forks(recipe.id)[0].id, fork.id)
 
+
+class APIRecipeForkList(Test):
+    def test_fork_list(self):
+        recipe = new_recipe(**sunny_side_up)
+        recipe2 = new_recipe(**begun_bhaja)
+        fork = fork_recipe(2, recipe.id)
+        forks = test_client.get('/fork/?recipe_id={}'.format(recipe.id)).data
+        forks = json.loads(forks)
+        self.assertEqual(forks[0]['id'], fork.id)
 
 class UpdateRecipe(Test):
 

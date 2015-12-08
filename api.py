@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_restful import Resource, fields, Api, reqparse
-from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe, update_recipe)
+from data import (get_recipe, get_recipes_for_user, fork_recipe, get_recipes_for_users, new_recipe, update_recipe, get_forks)
 from utils import marshal_with
 from schema import RecipeSchema, RecipeDataSchema
 from werkzeug.exceptions import BadRequest
@@ -14,6 +14,7 @@ api = Api(app)
 
 parser = reqparse.RequestParser()
 parser.add_argument('user_id', type=int, help='User ID', action="append")
+parser.add_argument('recipe_id', type=int, help='Recipe ID')
 
 class Recipe(Resource):
     @marshal_with(RecipeSchema)
@@ -46,6 +47,15 @@ class RecipeList(Resource):
         recipe = json.loads(request.data)
         return new_recipe(**recipe)
 
+class ForkList(Resource):
+    @marshal_with(RecipeSchema, many=True)
+    def get(self):
+        args = parser.parse_args()
+        recipe_id = args.get('recipe_id')
+        if not recipe_id:
+            raise BadRequest
+        return get_forks(recipe_id)
+
 
 class Fork(Resource):
     @marshal_with(RecipeSchema)
@@ -63,6 +73,7 @@ api.add_resource(Ping,       '/ping/')
 api.add_resource(Recipe,     '/recipe/<int:recipe_id>/')
 api.add_resource(Fork,       '/fork/<int:recipe_id>/')
 api.add_resource(RecipeList, '/recipe/')
+api.add_resource(ForkList,   '/fork/')
 
 @app.route('/clean')
 def _clean():
