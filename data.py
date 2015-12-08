@@ -49,5 +49,16 @@ def get_versions(recipe_id):
     included_parts = included_parts.union_all(
         db.session.query(parts_alias).filter(parts_alias.id==incl_alias.c.parent_id)
     )
+    return [x[0] for x in db.session.query(included_parts.c.id).filter(db.RecipeData.id==data_tip_id).all()]
 
-    return db.session.query(included_parts).filter(db.RecipeData.id==data_tip_id).all()
+class BadVersionError(Exception):
+    pass
+
+def get_version(recipe_id, version_id):
+    if version_id not in get_versions(recipe_id):
+        raise BadVersionError
+    recipe = get_recipe(recipe_id)
+    data = db.session.query(db.RecipeData).get(version_id)
+    recipe.data = data
+    return recipe
+

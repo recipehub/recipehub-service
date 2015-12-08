@@ -2,7 +2,7 @@ import unittest
 import db
 import json
 from datetime import datetime
-from data import new_recipe, fork_recipe, update_recipe, get_versions, get_recipes_for_user, get_forks
+from data import new_recipe, fork_recipe, update_recipe, get_versions, get_recipes_for_user, get_forks, get_version, BadVersionError
 from api import app
 app.config['DEBUG'] = True
 
@@ -98,6 +98,20 @@ class APIGetVersions(TestWithData):
         versions = test_client.get('/version/{}/'.format(recipe.id)).data
         versions = json.loads(versions)
         self.assertEqual(len(versions), 2)
+
+class GetVersion(TestWithData):
+
+    def test_get_version(self):
+        recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
+        old_version_id = get_versions(recipe.id)[1]
+        self.assertEqual(get_version(recipe.id, old_version_id).data.id, old_version_id)
+
+    def test_bad_version(self):
+        recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
+        recipe2 = db.session.query(db.Recipe).filter_by(title='Begun Bhaja').first()
+        old_version_id = get_versions(recipe.id)[1]
+        with self.assertRaises(BadVersionError):
+            get_version(recipe2.id, old_version_id)
 
 
 class Timestamp(TestWithData):
