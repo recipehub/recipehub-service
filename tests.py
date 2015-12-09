@@ -197,6 +197,7 @@ class TestUpdateRecipe(Test):
 sunny_side_up = {
     # "id": 1,
     "title": "Sunny side up",
+    "description": "Sunny side up",
     "user_id": 1,
     "fork_of": None,
     "ingredients": {
@@ -236,6 +237,7 @@ sunny_side_up_v2 = {
 
 begun_bhaja = {
     "title": "Begun Bhaja",
+    "description": "Fried Eggplant",
     "user_id": 2,
     "fork_of": None,
     "ingredients": {
