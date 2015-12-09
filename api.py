@@ -31,7 +31,7 @@ class Recipe(Resource):
         recipe_data = json.loads(request.data)
         if not recipe_data.get('ingredients') or not recipe_data.get('steps'):
             raise BadRequest
-        return update_recipe(recipe_id, ingredients=recipe_data['ingredients'], steps=recipe_data['steps'])
+        return update_recipe(recipe_id, ingredients=recipe_data['ingredients'], steps=recipe_data['steps'], message=recipe_data.get('message'), title=recipe_data.get('title'), description=recipe_data.get('description'))
 
 
 class RecipeList(Resource):
@@ -70,7 +70,6 @@ class Fork(Resource):
         return fork_recipe(user_id, recipe_id)
 
 class Version(Resource):
-    @marshal_with(RecipeSchema, many=True)
     def get(self, recipe_id):
         return get_versions(recipe_id)
 

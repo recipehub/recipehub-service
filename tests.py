@@ -103,7 +103,7 @@ class GetVersion(TestWithData):
 
     def test_get_version(self):
         recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
-        old_version_id = get_versions(recipe.id)[1]
+        old_version_id = get_versions(recipe.id)[1][0]
         self.assertEqual(get_version(recipe.id, old_version_id).data.id, old_version_id)
 
     def test_bad_version(self):
@@ -118,7 +118,7 @@ class APIGetVersion(TestWithData):
 
     def test_get_version(self):
         recipe = db.session.query(db.Recipe).filter_by(title='Sunny side up').first()
-        old_version_id = get_versions(recipe.id)[1]
+        old_version_id = get_versions(recipe.id)[1][0]
         data = test_client.get('/recipe/{}/?version_id={}'.format(recipe.id, old_version_id)).data
         data = json.loads(data)
         self.assertEqual(data['data']['id'], old_version_id)
@@ -179,12 +179,19 @@ class TestNewRecipe(Test):
 class TestUpdateRecipe(Test):
 
     def test_update_recipe(self):
-        recipe = new_recipe(**sunny_side_up)
-        test_client.put('/recipe/{}/'.format(recipe.id), data=json.dumps(sunny_side_up_v2))
+        self.recipe = new_recipe(**sunny_side_up)
+        test_client.put('/recipe/{}/'.format(self.recipe.id), data=json.dumps(sunny_side_up_v2))
         self.assertEqual(db.session.query(db.Recipe).count(), 1)
         self.assertEqual(db.session.query(db.RecipeData).count(), 2)
         recipe = db.session.query(db.Recipe).first()
         self.assertIn("cheese", recipe.data.ingredients)
+
+    def test_update_title(self):
+        recipe = db.session.query(db.Recipe).first()
+        test_client.put('/recipe/{}/'.format(recipe.id), data=json.dumps(sunny_side_up_v2))
+        recipe = db.session.query(db.Recipe).get(recipe.id)
+        self.assertIn("cheese", recipe.data.ingredients)
+        self.assertIn("cheese", recipe.title)
 # Test Data
 
 sunny_side_up = {
@@ -208,7 +215,7 @@ sunny_side_up = {
 
 sunny_side_up_v2 = {
     # "id": 1,
-    "title": "Sunny side up",
+    "title": "Sunny side up with cheese",
     "user_id": 1,
     "fork_of": None,
     "ingredients": {
@@ -223,7 +230,8 @@ sunny_side_up_v2 = {
         "sprinkle cheese on the eggs",
         "Add salt and close the lid",
         "Once done serve in plate"
-    ]
+    ],
+    "message": "Add Cheese"
 }
 
 begun_bhaja = {
@@ -248,7 +256,7 @@ begun_bhaja = {
 
 def insert_all():
         recipe = new_recipe(**sunny_side_up)
-        update_recipe(recipe.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'])
+        update_recipe(recipe.id, ingredients=sunny_side_up_v2['ingredients'], steps=sunny_side_up_v2['steps'], message=sunny_side_up_v2['message'])
         new_recipe(**begun_bhaja)
 
 if __name__ == '__main__':

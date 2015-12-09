@@ -19,6 +19,7 @@ class Recipe(Base):
     id = Column(Integer(), primary_key=True)
     created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     title = Column(String(140))
+    description = Column(String(255))
     user_id = Column(Integer())
     fork_of_id = Column(Integer(), ForeignKey('recipe.id'), nullable=True)
     data_id = Column(Integer(), ForeignKey('recipe_data.id'), nullable=False)
@@ -28,6 +29,7 @@ class Recipe(Base):
 class RecipeData(Base):
     __tablename__ = 'recipe_data'
     id = Column(Integer(), primary_key=True)
+    message = Column(String(255))
     created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     ingredients = Column(JSON())
     steps = Column(JSON())

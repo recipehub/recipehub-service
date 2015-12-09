@@ -11,7 +11,7 @@ def get_recipes_for_users(user_ids):
     return db.session.query(db.Recipe).filter(db.Recipe.user_id.in_(user_ids)).order_by(db.Recipe.created_at.desc()).all()
 
 def new_recipe(title, user_id, ingredients, steps, id=None, fork_of=None):
-    data = db.RecipeData(ingredients=ingredients, steps=steps)
+    data = db.RecipeData(ingredients=ingredients, steps=steps, message="New Recipe")
     db.session.add(data)
     db.session.flush()
     recipe = db.Recipe(title=title, user_id=user_id, data=data)
@@ -29,12 +29,17 @@ def fork_recipe(user_id, recipe_id):
 def get_forks(recipe_id):
     return db.session.query(db.Recipe).filter_by(fork_of_id=recipe_id).all()
 
-def update_recipe(recipe_id, ingredients=None, steps=None):
+def update_recipe(recipe_id, ingredients=None, steps=None, message=None, title=None, description=None):
     recipe = db.session.query(db.Recipe).get(recipe_id)
-    data = db.RecipeData(ingredients=ingredients, steps=steps, parent_id=recipe.data.id)
+    data = db.RecipeData(ingredients=ingredients, steps=steps, parent_id=recipe.data.id, message=message)
     db.session.add(data)
     db.session.flush()
-    db.session.query(db.Recipe).filter_by(id=recipe_id).update({"data_id": data.id})
+    update_dict = {"data_id": data.id}
+    if title:
+        update_dict.update({'title': title})
+    if description:
+        update_dict.update({'description': description})
+    db.session.query(db.Recipe).filter_by(id=recipe_id).update(update_dict)
     db.session.flush()
     return get_recipe(recipe.id)
 
@@ -49,13 +54,15 @@ def get_versions(recipe_id):
     included_parts = included_parts.union_all(
         db.session.query(parts_alias).filter(parts_alias.id==incl_alias.c.parent_id)
     )
+    return db.session.query(included_parts.c.id, included_parts.c.message).filter(db.RecipeData.id==data_tip_id).all()
     return [x[0] for x in db.session.query(included_parts.c.id).filter(db.RecipeData.id==data_tip_id).all()]
 
 class BadVersionError(Exception):
     pass
 
 def get_version(recipe_id, version_id):
-    if version_id not in get_versions(recipe_id):
+    valid_ids = [x[0] for x in get_versions(recipe_id)]
+    if version_id not in valid_ids:
         raise BadVersionError
     recipe = get_recipe(recipe_id)
     data = db.session.query(db.RecipeData).get(version_id)
