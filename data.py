@@ -1,5 +1,7 @@
 import db
 import json
+from sqlalchemy.orm.session import make_transient
+
 
 def get_recipe(recipe_id):
     return db.session.query(db.Recipe).get(recipe_id)
@@ -65,7 +67,11 @@ def get_version(recipe_id, version_id):
     if version_id not in valid_ids:
         raise BadVersionError
     recipe = get_recipe(recipe_id)
+    db.session.expunge(recipe)
+    make_transient(recipe)
     data = db.session.query(db.RecipeData).get(version_id)
+    db.session.expunge(data)
+    make_transient(data)
     recipe.data = data
     return recipe
 
