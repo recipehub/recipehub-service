@@ -42,7 +42,7 @@ Author: [Pratik Vyas](https://github.com/pdvyas)
 * Make a virtualenv
 
     ```
-    mkvirtualenv recipehub-ui-dev -a `pwd` && add2virtualenv `pwd`
+    mkvirtualenv recipehub-service -a `pwd` && add2virtualenv `pwd`
     ```
 
 * Create postgres db
