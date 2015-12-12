@@ -8,7 +8,7 @@ Author: [Pratik Vyas](https://github.com/pdvyas)
 ![Copy on write](http://i.imgur.com/4UYv2KB.png)
 * Recursive querying to list versions
 * Efficient forking
-![Copy on write](http://i.imgur.com/4UYv2KB.png)
+![Copy on write](http://i.imgur.com/tL2nlbv.png)
 * Exposes a ReSTFul API
 
 ### Installation
